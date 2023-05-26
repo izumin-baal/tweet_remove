@@ -1,4 +1,4 @@
-# tweet_remove
+# 自分用Twitter黒歴史クリーナー
 Twitterのツイート削除用API
 
 ## 必要パッケージのインストール
@@ -41,7 +41,7 @@ TOKEN_SECRET="XXXXXXXXXXX"
 ```
 
 ## 実行
-- APIで50ツイートが削除される。
+- APIで古いツイートから順に50ツイートが削除される。
 - Freeプランでのツイート削除APIの上限が50/day
 - cronやらfunctionやらで適当に毎日動かしておけば良い
 ```
