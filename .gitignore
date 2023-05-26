@@ -1,3 +1,4 @@
 .env
 venv
-tweet-handers*
+tweet-handers.json
+tweet-handers.js
