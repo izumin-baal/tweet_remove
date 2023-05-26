@@ -4,17 +4,13 @@ import os
 import json
 import time
 
-# In your terminal please set your environment variables by running the following lines of code.
-# export 'CONSUMER_KEY'='<your_consumer_key>'
-# export 'CONSUMER_SECRET'='<your_consumer_secret>'
-
 load_dotenv()
 consumer_key = os.environ.get("API_KEY")
 consumer_secret = os.environ.get("API_KEY_SECRET")
 access_token = os.environ.get("ACCESS_TOKEN")
 access_token_secret = os.environ.get("TOKEN_SECRET")
 
-# Make the request
+# Oauth
 oauth = OAuth1Session(
     consumer_key,
     client_secret=consumer_secret,
@@ -24,27 +20,30 @@ oauth = OAuth1Session(
 
 def main():
     print("### Tweet Remover ###")
-    with open("./tweets.json") as f:
+    with open("./tweet-headers.json") as f:
         data = json.load(f)
-    tweets = data["tweet_id"].copy()
-    for id in tweets:
-        print("Delete Tweet ID: " + str(id))
-        # Making the request
-        response = oauth.delete("https://api.twitter.com/2/tweets/{}".format(id))
-
-        if response.status_code != 200:
+    tweets = data["data"].copy()
+    for cnt,tweetData in enumerate(reversed(tweets),1):
+        tweet_id = tweetData["tweet"]["tweet_id"]
+        print('No.' + str(cnt))
+        print("Delete Tweet ID: " + str(tweet_id))
+        # Request
+        response = oauth.delete("https://api.twitter.com/2/tweets/{}".format(tweet_id))
+        if response.status_code == 429:
+            print("APIのリクエスト上限")
+            exit()
+        elif response.status_code != 200:
             raise Exception(
                 "Request returned an error: {} {}".format(response.status_code, response.text)
             )
-
         print("Response code: {}".format(response.status_code))
-
-        # Saving the response as JSON
-        json_response = response.json()
-        print(json_response)
-        data["tweet_id"].remove(id)
-        with open("./tweets.json", mode='w') as f:
+        data["data"].remove(tweetData)
+        with open("./tweet-headers.json", mode='w') as f:
             json.dump(data,f,indent=4)
+        time.sleep(1)
+        if cnt >= 50:
+            print("### 50 POST Done. ###")
+            exit()
         
 
 if __name__ == "__main__":
