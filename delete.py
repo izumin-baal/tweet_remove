@@ -48,7 +48,7 @@ def main():
         with open("./tweet-headers.json", mode='w') as f:
             json.dump(data,f,indent=4)
         with open("./tweet-remove.log", mode='a', encoding='utf-8') as f:
-            f.write("Tweet_id: " + str(tweet_id) + "    Status: " + response.status_code + '\n')
+            f.write("Tweet_id: " + str(tweet_id) + "    Status: " + str(response.status_code) + '\n')
         time.sleep(1)
         if cnt >= 50:
             print("### 50 POST Done. ###")
