@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 import json
 import time
+import datetime
 
 load_dotenv()
 consumer_key = os.environ.get("API_KEY")
@@ -20,6 +21,10 @@ oauth = OAuth1Session(
 
 def main():
     print("### Tweet Remover ###")
+    with open("./tweet-remove.log", mode='a', encoding='utf-8') as f:
+        dt = datetime.datetime.now()
+        timestamp = dt.strftime('%Y/%m/%d %H:%M:%S')
+        f.write("### " + timestamp + " ###\n")
     with open("./tweet-headers.json") as f:
         data = json.load(f)
     tweets = data["data"].copy()
@@ -31,6 +36,8 @@ def main():
         response = oauth.delete("https://api.twitter.com/2/tweets/{}".format(tweet_id))
         if response.status_code == 429:
             print("APIのリクエスト上限")
+            with open("./tweet-remove.log", mode='a', encoding='utf-8') as f:
+                f.write("Tweet_id: " + str(tweet_id) + "    Status: Too Many Requests\n")
             exit()
         elif response.status_code != 200:
             raise Exception(
@@ -40,6 +47,8 @@ def main():
         data["data"].remove(tweetData)
         with open("./tweet-headers.json", mode='w') as f:
             json.dump(data,f,indent=4)
+        with open("./tweet-remove.log", mode='a', encoding='utf-8') as f:
+            f.write("Tweet_id: " + str(tweet_id) + "    Status: " + response.status_code + '\n')
         time.sleep(1)
         if cnt >= 50:
             print("### 50 POST Done. ###")
