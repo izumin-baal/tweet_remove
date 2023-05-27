@@ -1,3 +1,4 @@
 .env
 venv
 tweet-headers.*
+tweet-remove.log
